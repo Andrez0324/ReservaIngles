@@ -1,37 +1,31 @@
 import React from 'react';
 import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
 import EtiquetaNivel from './EtiquetaNivel';
-import { colors, radius, spacing, typografy} from '../theme';
-import LabelLevel from './EtiquetaNivel';
-import {CLASES, formatearPrecio} from '../data/clases';
+import { colors, radius, spacing } from '../theme';
+import { formatearPrecio } from '../data/clases';
 
-export default function Card ({urlImagen, onPress, ancho}){
+export default function Card ({ clase, onPress }){
     return(
         <Pressable
             onPress={onPress}
-
+            style={styles.tarjeta}
         >
-            <Image source={{uri:'La url de la imagen'}} style={""} resizeMode='cover'/>
-            <View>
+            <Image source={{ uri: clase.imagen }} style={styles.imagen} resizeMode="cover" />
+            <View style={styles.cuerpo}>
                 <EtiquetaNivel nivel={clase.nivel}/>
-            </View>
-            <View>
-                <Text>
-                    {clase.profesor.nombre} 
-                </Text>
-                <Text>
-                    {clase.horarios}
-                </Text>
-                <Text>
-                    {clase.precio}
-                </Text>
+                <Text style={styles.titulo}>{clase.titulo}</Text>
+                <Text style={styles.profesor}>{clase.profesor.nombre}</Text>
+                <View style={styles.pie}>
+                    <Text style={styles.meta}>{clase.duracion} min</Text>
+                    <Text style={styles.precio}>{formatearPrecio(clase.precio)}</Text>
+                </View>
             </View>
        </Pressable>
 
     )
 }
 
-    const style = StyleSheet.create({
+    const styles = StyleSheet.create({
         tarjeta: {
             backgroundColor: colors.superficie,
             borderRadius: radius.lg,
