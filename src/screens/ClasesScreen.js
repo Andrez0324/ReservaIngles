@@ -2,22 +2,19 @@ import React, { useState, useMemo } from "react";
 import {
   View,
   Text,
-  Image,
-  Pressable,
-  StyleSheet,
   TextInput,
   ScrollView,
   FlatList,
+  StyleSheet,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import EstadoVacio from "../components/EstadoVacio";
-import EtiquetaNivel from "../components/EtiquetaNivel";
 import NivelChip from "../components/NivelChip";
 import Card from "../components/Card";
 import useResponsive from "../hooks/useResponsive";
 import { colors, radius, spacing, typography } from "../theme";
-import { formatearPrecio, CLASES, NIVELES } from "../data/clases";
+import { CLASES, NIVELES } from "../data/clases";
 
 export default function ClasesScreen({ navigation }) {
   const insets = useSafeAreaInsets();
@@ -25,9 +22,12 @@ export default function ClasesScreen({ navigation }) {
   const [nivel, setNivel] = useState("Todos");
   const [busqueda, setBusqueda] = useState("");
 
+  // Estado local para manejar las clases y poder restar cupos en tiempo real
+  const [clasesLista, setClasesLista] = useState(CLASES);
+
   const resultados = useMemo(() => {
     const textoBusqueda = busqueda.trim().toLowerCase();
-    return CLASES.filter((clase) => {
+    return clasesLista.filter((clase) => {
       const coincideNivel = nivel === "Todos" || clase.nivel === nivel;
       const coincideTexto =
         textoBusqueda === "" ||
@@ -35,34 +35,54 @@ export default function ClasesScreen({ navigation }) {
         clase.titulo.toLowerCase().includes(textoBusqueda);
       return coincideNivel && coincideTexto;
     });
-  }, [nivel, busqueda]);
+  }, [nivel, busqueda, clasesLista]);
+
+  // Función para actualizar los cupos de una clase específica tras una reserva
+  const actualizarCuposClase = (idClase) => {
+    setClasesLista((prevClases) =>
+      prevClases.map((item) => {
+        if (item.id === idClase && item.cupos > 0) {
+          return { ...item, cupos: item.cupos - 1 };
+        }
+        return item;
+      }),
+    );
+  };
 
   return (
     <View style={[style.pantalla, { paddingTop: insets.top + spacing.md }]}>
-      <View style={style.buscador}>
-        <Text style={typography.titulo}>Aplicacion para clases de ingles </Text>
-        <Ionicons name="search" size={18} color={colors.textoSuave} />
-        <TextInput
-          style={style.input}
-          placeholder="Buscar por nivel"
-          value={busqueda}
-          onChangeText={setBusqueda}
-          autoCorrect={false}
-        />
-
-        {busqueda.length > 0 && (
-          <Ionicons
-            name="close-circle"
-            size={18}
-            color={colors.textoSuave}
-            onPress={() => setBusqueda("")}
+      <View
+        style={[
+          style.buscadorContainer,
+          { marginHorizontal: paddingHorizontal },
+        ]}
+      >
+        <Text style={typography.titulo}>Clases de Inglés</Text>
+        <View style={style.buscador}>
+          <Ionicons name="search" size={18} color={colors.textoSuave} />
+          <TextInput
+            style={style.input}
+            placeholder="Buscar por profesor o título"
+            value={busqueda}
+            onChangeText={setBusqueda}
+            autoCorrect={false}
           />
-        )}
+          {busqueda.length > 0 && (
+            <Ionicons
+              name="close-circle"
+              size={18}
+              color={colors.textoSuave}
+              onPress={() => setBusqueda("")}
+            />
+          )}
+        </View>
       </View>
+
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={{ flexGrow: 0 }}
+        style={{ flexGrow: 0, paddingHorizontal }}
+        contentContainerStyle={{ gap: spacing.sm, marginVertical: spacing.md }}
       >
         {NIVELES.map((item) => (
           <NivelChip
@@ -73,6 +93,7 @@ export default function ClasesScreen({ navigation }) {
           />
         ))}
       </ScrollView>
+
       <FlatList
         data={resultados}
         keyExtractor={(item) => item.id}
@@ -80,7 +101,10 @@ export default function ClasesScreen({ navigation }) {
           <Card
             clase={item}
             onPress={() =>
-              navigation.navigate("DetallesClase", { clase: item })
+              navigation.navigate("DetallesClase", {
+                clase: item,
+                onReservarExitoso: actualizarCuposClase, // Pasamos la función como parámetro
+              })
             }
           />
         )}
@@ -89,11 +113,12 @@ export default function ClasesScreen({ navigation }) {
           flexGrow: 1,
         }}
         numColumns={columnas}
-        listEmptyComponent={
+        columnWrapperStyle={columnas > 1 ? { gap: spacing.md } : undefined}
+        ListEmptyComponent={
           <EstadoVacio
             icono="search-outline"
-            titulo="No encontraramos resultados"
-            mensaje="La combinacion de busqueda no tiene resultados"
+            titulo="No encontramos resultados"
+            mensaje="La combinación de búsqueda no tiene resultados"
             onAction={() => {
               setNivel("Todos");
               setBusqueda("");
@@ -107,7 +132,7 @@ export default function ClasesScreen({ navigation }) {
 
 const style = StyleSheet.create({
   pantalla: { flex: 1, backgroundColor: colors.fondo },
-
+  buscadorContainer: { gap: spacing.md, marginBottom: spacing.sm },
   buscador: {
     flexDirection: "row",
     alignItems: "center",
@@ -116,10 +141,8 @@ const style = StyleSheet.create({
     borderRadius: radius.md,
     paddingHorizontal: spacing.lg,
     height: 46,
-    marginTop: spacing.lg,
     borderWidth: 1,
     borderColor: colors.borde,
   },
-
   input: { flex: 1, fontSize: 14, color: colors.texto, paddingVertical: 0 },
 });
