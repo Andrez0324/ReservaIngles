@@ -1,17 +1,34 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, radius, spacing, typography } from "../theme";
+import { colors, radius, spacing } from "../theme";
 
-export default function EstadoVacio({ icono, titulo, mensaje, onAction }) {
+export default function EstadoVacio({
+  icono,
+  titulo,
+  mensaje,
+  onAction,
+}) {
   return (
-    <View style={styles.contenedor}>
-      <Ionicons name={icono} size={36} color={colors.textoSuave} />
-      <Text style={[typography.subtitulo, styles.titulo]}>{titulo}</Text>
-      <Text style={[typography.secundario, styles.mensaje]}>{mensaje}</Text>
-
+    <View style={styles.container}>
+      {icono ? (
+        <Ionicons
+          name={icono}
+          size={34}
+          color={colors.textoSecundario}
+          accessibilityElementsHidden
+        />
+      ) : null}
+      {titulo ? <Text style={styles.titulo}>{titulo}</Text> : null}
+      <Text style={styles.texto}>
+        {mensaje || "No hay elementos para mostrar"}
+      </Text>
       {onAction ? (
-        <Pressable onPress={onAction} style={styles.boton}>
+        <Pressable
+          accessibilityRole="button"
+          onPress={onAction}
+          style={styles.boton}
+        >
           <Text style={styles.textoBoton}>Limpiar filtros</Text>
         </Pressable>
       ) : null}
@@ -20,33 +37,30 @@ export default function EstadoVacio({ icono, titulo, mensaje, onAction }) {
 }
 
 const styles = StyleSheet.create({
-  contenedor: {
+  container: {
     flex: 1,
-    minHeight: 220,
     justifyContent: "center",
     alignItems: "center",
     padding: spacing.xl,
-    textAlign: "center",
+    gap: spacing.sm,
   },
   titulo: {
-    marginTop: spacing.md,
-    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "700",
     color: colors.texto,
-  },
-  mensaje: {
-    marginTop: spacing.sm,
     textAlign: "center",
-    color: colors.textoSuave,
+  },
+  texto: {
+    fontSize: 15,
+    color: colors.textoSecundario,
+    textAlign: "center",
   },
   boton: {
-    marginTop: spacing.lg,
-    backgroundColor: colors.primario,
-    borderRadius: radius.full,
+    marginTop: spacing.sm,
     paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.md,
+    backgroundColor: colors.primario,
   },
-  textoBoton: {
-    color: "#FFFFFF",
-    fontWeight: "700",
-  },
+  textoBoton: { color: "#FFFFFF", fontWeight: "700" },
 });

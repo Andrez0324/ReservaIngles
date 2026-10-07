@@ -8,12 +8,8 @@ const Stack = createNativeStackNavigator();
 export default function ClasesStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Home" component={ClasesScreen} />
-      <Stack.Screen
-        name="DetallesClase"
-        component={DetallesClase}
-        options={{ headerShown: false }}
-      />
+      <Stack.Screen name="ListaClases" component={ClasesScreen} />
+      <Stack.Screen name="DetallesClase" component={DetallesClase} />
     </Stack.Navigator>
   );
 }

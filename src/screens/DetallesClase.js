@@ -15,22 +15,24 @@ import useResponsive from "../hooks/useResponsive";
 import { colors, radius, spacing, typography, sombra } from "../theme";
 import { formatearPrecio } from "../data/clases";
 import EtiquetaNivel from "../components/EtiquetaNivel";
+import useReserva from "../hooks/useReserva";
 
 export default function DetallesClase({ route, navigation }) {
   const insets = useSafeAreaInsets();
   const claseParam = route?.params?.clase;
-  const onReservarExitoso = route?.params?.onReservarExitoso;
   const { paddingHorizontal, esTablet } = useResponsive();
+  const { agregarReserva } = useReserva();
 
   // Estado local de la clase para actualizar los cupos en tiempo real en esta vista
   const [claseDetalle, setClaseDetalle] = useState(claseParam);
   const [horarioSeleccionado, setHorarioSeleccionado] = useState(null);
+  const [reservando, setReservando] = useState(false);
 
   if (!claseDetalle) {
     return null;
   }
 
-  const handleReservar = () => {
+  const handleReservar = async () => {
     if (!horarioSeleccionado) {
       Alert.alert(
         "Horario requerido",
@@ -47,27 +49,43 @@ export default function DetallesClase({ route, navigation }) {
       return;
     }
 
-    // 1. Restamos un cupo en el estado local de los detalles
-    setClaseDetalle((prev) => ({
-      ...prev,
-      cupos: prev.cupos - 1,
-    }));
+    if (reservando) return;
 
-    // 2. Ejecutamos la función que viene de ClasesScreen para actualizar la lista principal
-    if (onReservarExitoso) {
-      onReservarExitoso(claseDetalle.id);
+    setReservando(true);
+    try {
+      const resultado = await agregarReserva(claseDetalle, horarioSeleccionado);
+      if (!resultado.ok) {
+        Alert.alert(
+          "Reserva existente",
+          "Ya tienes una reserva para esta clase y horario.",
+        );
+        return;
+      }
+
+      setClaseDetalle((actual) => ({
+        ...actual,
+        cupos: actual.cupos - 1,
+      }));
+
+      Alert.alert(
+        "¡Reserva Exitosa!",
+        `Has reservado la clase "${claseDetalle.titulo}" con ${claseDetalle.profesor.nombre}.\n\nModalidad: ${claseDetalle.modalidad}\nHorario: ${horarioSeleccionado}`,
+        [
+          {
+            text: "Aceptar",
+            onPress: () => navigation.goBack(),
+          },
+        ],
+      );
+    } catch (error) {
+      console.error("Error al guardar la reserva:", error);
+      Alert.alert(
+        "No se pudo reservar",
+        "Ocurrió un error al guardar la reserva. Inténtalo nuevamente.",
+      );
+    } finally {
+      setReservando(false);
     }
-
-    Alert.alert(
-      "¡Reserva Exitosa!",
-      `Has reservado la clase "${claseDetalle.titulo}" con ${claseDetalle.profesor.nombre}.\n\nModalidad: ${claseDetalle.modalidad}\nHorario: ${horarioSeleccionado}`,
-      [
-        {
-          text: "Aceptar",
-          onPress: () => navigation.goBack(),
-        },
-      ],
-    );
   };
 
   return (
@@ -184,14 +202,18 @@ export default function DetallesClase({ route, navigation }) {
         <Pressable
           style={[
             estilos.botonReserva,
-            (!horarioSeleccionado || claseDetalle.cupos <= 0) &&
+            (!horarioSeleccionado || claseDetalle.cupos <= 0 || reservando) &&
               estilos.botonReservaDeshabilitado,
           ]}
           onPress={handleReservar}
-          disabled={claseDetalle.cupos <= 0}
+          disabled={!horarioSeleccionado || claseDetalle.cupos <= 0 || reservando}
         >
           <Text style={estilos.textoBotonReserva}>
-            {claseDetalle.cupos > 0 ? "Reservar Ahora" : "Agotado"}
+            {claseDetalle.cupos <= 0
+              ? "Agotado"
+              : reservando
+                ? "Guardando..."
+                : "Reservar Ahora"}
           </Text>
         </Pressable>
       </View>

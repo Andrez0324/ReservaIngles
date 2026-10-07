@@ -1,46 +1,42 @@
-import {useState, useEffect, useCallback} from 'react';
-import asyncStorage from '@react-native-async-storage/async-storage';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useState, useEffect, useCallback } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function useAlmacenamiento(clave, valorInicial) {
   const [valor, setValor] = useState(valorInicial);
-  const {listo, setListo} = useState(false);
+  const [listo, setListo] = useState(false);
 
   useEffect(() => {
+    let activo = true;
 
-  let activo = true; //Esto es una bandera para saber si estoy guardando el componente o no, para evitar errores de memoria
-
-  AsyncStorage.getItem(clave)
-    .then((guardando) => {
-      if (activo && guardando !== null) {
-        setValor(JSON.parse(guardando));
+    const cargar = async () => {
+      try {
+        const guardado = await AsyncStorage.getItem(clave);
+        if (activo && guardado !== null) {
+          setValor(JSON.parse(guardado));
+        }
+      } catch (error) {
+        console.error(
+          `Error al cargar el valor de ${clave} desde AsyncStorage:`,
+          error,
+        );
+      } finally {
+        if (activo) setListo(true);
       }
-      setListo(true);
-    })
-    .catch((error) => {
-      console.error(`Error al obtener el valor de ${clave} desde AsyncStorage:`, error);
-    })
-    .finally(() => {
-      setListo(true);
+    };
 
-      return () => {
-        activo = false; //Cuando el componente se desmonte, activo se vuelve falso y no se ejecuta el setValor
-      }
-    },{clave});
+    cargar();
+    return () => {
+      activo = false;
+    };
+  }, [clave]);
 
-    const actualizar = useCallback(
-        async (nuevoValor) => {
-            setValor(nuevoValor);
-            try {
-                await AsyncStorage.setItem(clave, JSON.stringify(nuevoValor));
+  const actualizar = useCallback(
+    async (nuevoValor) => {
+      await AsyncStorage.setItem(clave, JSON.stringify(nuevoValor));
+      setValor(nuevoValor);
+    },
+    [clave],
+  );
 
-            }catch (error) {
-                console.error(`Error al guardar el valor de ${clave} en AsyncStorage:`, error);
-            }
-        }, [clave]
-
-
-    );
-
-
-  }
+  return { valor, listo, actualizar };
+}

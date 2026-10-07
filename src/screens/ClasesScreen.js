@@ -15,15 +15,31 @@ import Card from "../components/Card";
 import useResponsive from "../hooks/useResponsive";
 import { colors, radius, spacing, typography } from "../theme";
 import { CLASES, NIVELES } from "../data/clases";
+import useReserva from "../hooks/useReserva";
 
 export default function ClasesScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const { columnas, paddingHorizontal } = useResponsive();
+  const { reservas } = useReserva();
   const [nivel, setNivel] = useState("Todos");
   const [busqueda, setBusqueda] = useState("");
 
-  // Estado local para manejar las clases y poder restar cupos en tiempo real
-  const [clasesLista, setClasesLista] = useState(CLASES);
+  const clasesLista = useMemo(() => {
+    const reservasPorClase = reservas.reduce((conteo, reserva) => {
+      const claseId =
+        reserva.claseId || String(reserva.id).split("-")[0];
+      conteo[claseId] = (conteo[claseId] || 0) + 1;
+      return conteo;
+    }, {});
+
+    return CLASES.map((clase) => ({
+      ...clase,
+      cupos: Math.max(
+        0,
+        clase.cupos - (reservasPorClase[String(clase.id)] || 0),
+      ),
+    }));
+  }, [reservas]);
 
   const resultados = useMemo(() => {
     const textoBusqueda = busqueda.trim().toLowerCase();
@@ -36,18 +52,6 @@ export default function ClasesScreen({ navigation }) {
       return coincideNivel && coincideTexto;
     });
   }, [nivel, busqueda, clasesLista]);
-
-  // Función para actualizar los cupos de una clase específica tras una reserva
-  const actualizarCuposClase = (idClase) => {
-    setClasesLista((prevClases) =>
-      prevClases.map((item) => {
-        if (item.id === idClase && item.cupos > 0) {
-          return { ...item, cupos: item.cupos - 1 };
-        }
-        return item;
-      }),
-    );
-  };
 
   return (
     <View style={[style.pantalla, { paddingTop: insets.top + spacing.md }]}>
@@ -103,7 +107,6 @@ export default function ClasesScreen({ navigation }) {
             onPress={() =>
               navigation.navigate("DetallesClase", {
                 clase: item,
-                onReservarExitoso: actualizarCuposClase, // Pasamos la función como parámetro
               })
             }
           />
