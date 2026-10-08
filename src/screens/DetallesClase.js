@@ -45,6 +45,10 @@ export default function DetallesClase({ route, navigation }) {
 
   const handleReservar = async () => {
     if (!horarioSeleccionado) {
+      console.log(
+        "Horario requerido",
+        "Por favor selecciona un horario antes de confirmar tu reserva.",
+      );
       Alert.alert(
         "Horario requerido",
         "Por favor selecciona un horario antes de confirmar tu reserva.",
@@ -69,6 +73,10 @@ export default function DetallesClase({ route, navigation }) {
             : resultado.codigo === "SIN_CUPOS"
               ? "Sin cupos"
               : "No se pudo reservar";
+        console.log(
+          tituloError,
+          resultado.mensaje || "No se pudo completar la reserva.",
+        );
         Alert.alert(
           tituloError,
           resultado.mensaje || "No se pudo completar la reserva.",
@@ -85,6 +93,10 @@ export default function DetallesClase({ route, navigation }) {
         return;
       }
 
+      console.log(
+        "¡Reserva Exitosa!",
+        `Has reservado la clase "${claseDetalle.titulo}" con ${claseDetalle.profesor.nombre}.\n\nModalidad: ${claseDetalle.modalidad}\nHorario: ${horarioSeleccionado}`,
+      );
       Alert.alert(
         "¡Reserva Exitosa!",
         `Has reservado la clase "${claseDetalle.titulo}" con ${claseDetalle.profesor.nombre}.\n\nModalidad: ${claseDetalle.modalidad}\nHorario: ${horarioSeleccionado}`,
@@ -97,6 +109,10 @@ export default function DetallesClase({ route, navigation }) {
       );
     } catch (error) {
       console.error("Error al guardar la reserva:", error);
+      console.log(
+        "No se pudo reservar",
+        "Ocurrió un error al guardar la reserva. Inténtalo nuevamente.",
+      );
       Alert.alert(
         "No se pudo reservar",
         "Ocurrió un error al guardar la reserva. Inténtalo nuevamente.",
