@@ -15,6 +15,7 @@ import useResponsive from "../hooks/useResponsive";
 import { colors, radius, spacing, typography, sombra } from "../theme";
 import { formatearPrecio } from "../data/clases";
 import EtiquetaNivel from "../components/EtiquetaNivel";
+import EstadoVacio from "../components/EstadoVacio";
 import useReserva from "../hooks/useReserva";
 
 export default function DetallesClase({ route, navigation }) {
@@ -29,7 +30,17 @@ export default function DetallesClase({ route, navigation }) {
   const [reservando, setReservando] = useState(false);
 
   if (!claseDetalle) {
-    return null;
+    return (
+      <View style={[estilos.pantalla, { paddingTop: insets.top }]}>
+        <EstadoVacio
+          icono="alert-circle-outline"
+          titulo="Clase no disponible"
+          mensaje="No se encontró la información de esta clase."
+          textoAccion="Volver a clases"
+          onAction={() => navigation.goBack()}
+        />
+      </View>
+    );
   }
 
   const handleReservar = async () => {

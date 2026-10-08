@@ -7,6 +7,7 @@ export default function EstadoVacio({
   icono,
   titulo,
   mensaje,
+  textoAccion = "Limpiar filtros",
   onAction,
 }) {
   return (
@@ -29,7 +30,7 @@ export default function EstadoVacio({
           onPress={onAction}
           style={styles.boton}
         >
-          <Text style={styles.textoBoton}>Limpiar filtros</Text>
+          <Text style={styles.textoBoton}>{textoAccion}</Text>
         </Pressable>
       ) : null}
     </View>

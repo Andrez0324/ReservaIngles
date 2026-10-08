@@ -65,21 +65,24 @@ export default function ClasesScreen({ navigation }) {
         </View>
       </View>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={{ flexGrow: 0, paddingHorizontal }}
-        contentContainerStyle={{ gap: spacing.sm, marginVertical: spacing.md }}
-      >
-        {NIVELES.map((item) => (
-          <NivelChip
-            key={item}
-            etiqueta={item}
-            activo={item === nivel}
-            onPress={() => setNivel(item)}
-          />
-        ))}
-      </ScrollView>
+      <View style={[style.filtros, { paddingHorizontal }]}>
+        <Text style={typography.secundario}>Filtrar por nivel</Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={style.niveles}
+          keyboardShouldPersistTaps="handled"
+        >
+          {NIVELES.map((item) => (
+            <NivelChip
+              key={item}
+              etiqueta={item}
+              activo={item === nivel}
+              onPress={() => setNivel(item)}
+            />
+          ))}
+        </ScrollView>
+      </View>
 
       <FlatList
         data={resultados}
@@ -119,6 +122,12 @@ export default function ClasesScreen({ navigation }) {
 const style = StyleSheet.create({
   pantalla: { flex: 1, backgroundColor: colors.fondo },
   buscadorContainer: { gap: spacing.md, marginBottom: spacing.sm },
+  filtros: { gap: spacing.xs },
+  niveles: {
+    gap: spacing.sm,
+    paddingVertical: spacing.xs,
+    alignItems: "center",
+  },
   buscador: {
     flexDirection: "row",
     alignItems: "center",

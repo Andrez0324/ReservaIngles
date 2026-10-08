@@ -75,7 +75,7 @@ Se agregó una capa para controlar el estado de lectura y recuperación de la in
 
 **Estado:** Correcto.
 
-## 2026-10-07 — Finalición estado de almacenamiento
+## 2026-10-07 — Finalización estado de almacenamiento
 
 **Módulo:** Persistencia local, recuperación y flujo de arranque.
 
@@ -94,6 +94,39 @@ Se agregó una capa para controlar el estado de lectura y recuperación de la in
 - Se verificó que la eliminación reanudable limpia únicamente las claves propias de la aplicación y conserva claves ajenas.
 
 **Estado:** Correcto.
+
+## 2026-10-07 — Preparación para Expo Go
+
+**Módulo:** Navegación, detalles de clase y configuración de Expo.
+
+**Archivos modificados o agregados:**
+
+- `app.json`
+- `package.json`
+- `package-lock.json`
+- `src/components/EstadoVacio.js`
+- `src/screens/DetallesClase.js`
+- `BITACORA.md`
+
+**Cambios realizados:**
+
+- Se configuró el nombre visible `Reserva Inglés`, un slug válido para Expo y los identificadores de Android e iOS.
+- Se alinearon las versiones de `expo`, `expo-font` y `expo-splash-screen` ya existentes con las versiones esperadas por el SDK 57; no se añadieron dependencias directas nuevas.
+- Se mantuvo el flujo de navegación de inicio, detalle, perfil y reservas integrado con el Provider y el almacenamiento local.
+
+**Problemas encontrados:**
+
+- La configuración de Expo conservaba el nombre y slug genéricos `React`.
+- La comprobación de Expo detectó versiones de tres dependencias existentes por debajo de las recomendadas para el SDK.
+- Una ruta de detalle sin clase válida podía dejar la pantalla vacía.
+
+**Solución aplicada:**
+
+- Se definió la identidad propia de la aplicación en Expo y los identificadores nativos estables.
+- Se actualizaron solo dependencias que ya estaban declaradas y se sincronizó el lockfile.
+- Se agregó una pantalla de recuperación contextual para el detalle inválido, sin instalar bibliotecas adicionales.
+
+**Estado:** Correcto para la ejecución nativa con Expo Go; el dispositivo móvil debe estar en la misma red local que el equipo que ejecuta Metro.
 
 ## Plantilla para registrar cambios futuros
 
