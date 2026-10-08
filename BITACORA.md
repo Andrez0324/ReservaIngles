@@ -45,6 +45,36 @@ Se agregó una capa para controlar el estado de lectura y recuperación de la in
 
 **Estado:** Correcto para la integración del Provider y el estado de almacenamiento; pendiente adaptar el contrato de detalle/reserva y finalizar la navegación en pasos siguientes.
 
+## 2026-10-07 — Integración del estado de almacenamiento
+
+**Módulo:** Persistencia local, contexto de reservas y flujo de arranque.
+
+**Archivos modificados o agregados:**
+
+- `App.js`
+- `src/components/EstadoAlmacenamiento.js`
+- `BITACORA.md`
+
+**Cambios realizados:**
+
+- Se integra la capa de `EstadoAlmacenamiento` en el árbol principal para controlar la carga, errores y recuperación de los datos almacenados.
+- El arranque de la app espera a que el almacenamiento esté listo antes de mostrar la navegación principal.
+- El flujo conserva la lógica del Provider de reservas y el manejo de recuperación ante datos corruptos o heredados.
+
+**Problemas encontrados:**
+
+- El punto anterior quedó centrado únicamente en el Provider, por lo que faltaba reencajar la capa del estado de almacenamiento sobre la app.
+
+**Solución aplicada:**
+
+- Se reintrodujo `EstadoAlmacenamiento` entre `ReservaProvider` y `RootNavigator` para cerrar la integración completa del siguiente paso.
+
+**Validación:**
+
+- Revisión del árbol de render y la lógica de carga del contexto de reservas.
+
+**Estado:** Correcto.
+
 ## Plantilla para registrar cambios futuros
 
 Agregar una copia de este formato al final del archivo por cada nueva entrega:

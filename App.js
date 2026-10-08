@@ -12,8 +12,8 @@ export default function App() {
         <EstadoAlmacenamiento>
           <RootNavigator />
         </EstadoAlmacenamiento>
-        <StatusBar style="auto" />
       </ReservaProvider>
+      <StatusBar style="auto" />
     </SafeAreaProvider>
   );
 }
