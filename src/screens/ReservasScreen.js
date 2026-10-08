@@ -83,7 +83,7 @@ export default function ReservasScreen({ navigation }) {
                 titulo="Aún no tienes reservas"
                 mensaje="Explora las clases, completa tu perfil y elige un horario para reservar."
                 textoAccion="Explorar clases"
-                onAction={() => navigation.navigate("Clases")}
+                onAction={() => navigation.navigate("Inicio")}
               />
             )}
           </View>

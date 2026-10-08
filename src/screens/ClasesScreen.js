@@ -14,36 +14,19 @@ import NivelChip from "../components/NivelChip";
 import Card from "../components/Card";
 import useResponsive from "../hooks/useResponsive";
 import { colors, radius, spacing, typography } from "../theme";
-import { CLASES, NIVELES } from "../data/clases";
+import { NIVELES } from "../data/clases";
 import useReserva from "../hooks/useReserva";
 
 export default function ClasesScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const { columnas, paddingHorizontal } = useResponsive();
-  const { reservas } = useReserva();
+  const { clases } = useReserva();
   const [nivel, setNivel] = useState("Todos");
   const [busqueda, setBusqueda] = useState("");
 
-  const clasesLista = useMemo(() => {
-    const reservasPorClase = reservas.reduce((conteo, reserva) => {
-      const claseId =
-        reserva.claseId || String(reserva.id).split("-")[0];
-      conteo[claseId] = (conteo[claseId] || 0) + 1;
-      return conteo;
-    }, {});
-
-    return CLASES.map((clase) => ({
-      ...clase,
-      cupos: Math.max(
-        0,
-        clase.cupos - (reservasPorClase[String(clase.id)] || 0),
-      ),
-    }));
-  }, [reservas]);
-
   const resultados = useMemo(() => {
     const textoBusqueda = busqueda.trim().toLowerCase();
-    return clasesLista.filter((clase) => {
+    return clases.filter((clase) => {
       const coincideNivel = nivel === "Todos" || clase.nivel === nivel;
       const coincideTexto =
         textoBusqueda === "" ||
@@ -51,7 +34,7 @@ export default function ClasesScreen({ navigation }) {
         clase.titulo.toLowerCase().includes(textoBusqueda);
       return coincideNivel && coincideTexto;
     });
-  }, [nivel, busqueda, clasesLista]);
+  }, [nivel, busqueda, clases]);
 
   return (
     <View style={[style.pantalla, { paddingTop: insets.top + spacing.md }]}>

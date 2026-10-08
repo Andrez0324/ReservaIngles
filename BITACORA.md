@@ -75,6 +75,26 @@ Se agregó una capa para controlar el estado de lectura y recuperación de la in
 
 **Estado:** Correcto.
 
+## 2026-10-07 — Finalición estado de almacenamiento
+
+**Módulo:** Persistencia local, recuperación y flujo de arranque.
+
+**Archivos modificados o agregados:**
+
+- `src/state/reservationStore.test.cjs`
+- `package.json`
+- `BITACORA.md`
+
+**Cambios realizados:**
+
+- Se añadieron pruebas automatizadas para la carga inicial, los errores de lectura y escritura, la recuperación de datos corruptos, la conservación del historial anterior y la reanudación de una eliminación interrumpida.
+- Se comprobó que si falla la escritura del respaldo, los datos corruptos originales permanecen intactos y la operación devuelve un error explícito.
+- Se comprobó que los fallos de almacenamiento se reporten explícitamente y que el estado no habilite operaciones hasta completar una lectura o recuperación satisfactoria.
+- Se verificó que el respaldo conserva el contenido original antes de inicializar datos vacíos y que el historial legado queda sin asignación de propietario.
+- Se verificó que la eliminación reanudable limpia únicamente las claves propias de la aplicación y conserva claves ajenas.
+
+**Estado:** Correcto.
+
 ## Plantilla para registrar cambios futuros
 
 Agregar una copia de este formato al final del archivo por cada nueva entrega:

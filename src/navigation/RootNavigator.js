@@ -2,12 +2,11 @@ import React from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import AppTabs from "./AppTabs";
-import PerfilScreen from "../screens/PerfilScreen";
 import useReserva from "../hooks/useReserva";
 import { colors, spacing } from "../theme";
 
 export default function RootNavigator() {
-  const { estudiante, cargando } = useReserva();
+  const { cargando } = useReserva();
 
   return (
     <NavigationContainer>
@@ -16,10 +15,8 @@ export default function RootNavigator() {
           <ActivityIndicator size="large" color={colors.primario} />
           <Text style={styles.texto}>Cargando tus datos...</Text>
         </View>
-      ) : estudiante ? (
-        <AppTabs />
       ) : (
-        <PerfilScreen />
+        <AppTabs />
       )}
     </NavigationContainer>
   );

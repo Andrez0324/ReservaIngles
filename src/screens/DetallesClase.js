@@ -21,10 +21,10 @@ export default function DetallesClase({ route, navigation }) {
   const insets = useSafeAreaInsets();
   const claseParam = route?.params?.clase;
   const { paddingHorizontal, esTablet } = useResponsive();
-  const { agregarReserva } = useReserva();
+  const { agregarReserva, clases } = useReserva();
 
-  // Estado local de la clase para actualizar los cupos en tiempo real en esta vista
-  const [claseDetalle, setClaseDetalle] = useState(claseParam);
+  const claseDetalle =
+    clases.find((clase) => clase.id === claseParam?.id) || claseParam;
   const [horarioSeleccionado, setHorarioSeleccionado] = useState(null);
   const [reservando, setReservando] = useState(false);
 
@@ -41,31 +41,38 @@ export default function DetallesClase({ route, navigation }) {
       return;
     }
 
-    if (claseDetalle.cupos <= 0) {
-      Alert.alert(
-        "Sin cupos",
-        "Lo sentimos, esta clase ya no tiene cupos disponibles.",
-      );
-      return;
-    }
-
     if (reservando) return;
 
     setReservando(true);
     try {
-      const resultado = await agregarReserva(claseDetalle, horarioSeleccionado);
+      const resultado = await agregarReserva(
+        claseDetalle.id,
+        horarioSeleccionado,
+      );
       if (!resultado.ok) {
+        const esPerfilRequerido = resultado.codigo === "PERFIL_REQUERIDO";
+        const tituloError = esPerfilRequerido
+          ? "Completa tu perfil"
+          : resultado.codigo === "DUPLICADA"
+            ? "Reserva existente"
+            : resultado.codigo === "SIN_CUPOS"
+              ? "Sin cupos"
+              : "No se pudo reservar";
         Alert.alert(
-          "Reserva existente",
-          "Ya tienes una reserva para esta clase y horario.",
+          tituloError,
+          resultado.mensaje || "No se pudo completar la reserva.",
+          esPerfilRequerido
+            ? [
+                { text: "Ahora no", style: "cancel" },
+                {
+                  text: "Ir a mi perfil",
+                  onPress: () => navigation.navigate("Perfil"),
+                },
+              ]
+            : undefined,
         );
         return;
       }
-
-      setClaseDetalle((actual) => ({
-        ...actual,
-        cupos: actual.cupos - 1,
-      }));
 
       Alert.alert(
         "¡Reserva Exitosa!",
